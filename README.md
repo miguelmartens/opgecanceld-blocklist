@@ -1,4 +1,4 @@
-# Opgecanceld
+# Opgecanceld Blocklist
 
 A domain blocklist focused on blocking YouTube advertisements, tracking, and ad-related services. Use this list to reduce or block YouTube ads across your devices and ad-blocking tools.
 
@@ -83,7 +83,7 @@ The `discover` tool uses a headless browser to capture network traffic from YouT
 **Requirements:** Chrome or Chromium must be installed (chromedp will find it automatically). Go 1.26+ to build from source.
 
 ```bash
-# Build and run (visits 9 videos: trending + popular, 1 minute per video by default)
+# Build and run (visits 8 popular videos, 1 minute per video by default)
 make run
 
 # Or with go run
@@ -116,7 +116,7 @@ go run ./cmd/discover/
 
 A [scheduled workflow](.github/workflows/discover-scheduled.yml) runs **daily** at 6am UTC to discover new YouTube ad domains and open a pull request with any updates:
 
-1. Runs the discover tool across 9 videos (trending + popular videos with ads), 1 minute per video
+1. Runs the discover tool across 8 popular videos with ads, 1 minute per video
 2. Appends new domains to the blocklist and regenerates filters
 3. Creates a PR with the changes (or updates an existing PR)
 4. Auto-approves and enables auto-merge so the PR merges without manual intervention

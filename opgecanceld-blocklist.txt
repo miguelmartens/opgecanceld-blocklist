@@ -9253,3 +9253,6 @@ rr8---sn-htgx20capjpq-jb3l.googlevideo.com
 # --- Discovered domains ---
 rr1---sn-32o-bg9e.googlevideo.com
 rr5---sn-32o-bg9e.googlevideo.com
+
+# --- Discovered domains ---
+rr1---sn-q4fzen7s.googlevideo.com

@@ -3,6 +3,7 @@ package discover
 
 import (
 	"context"
+	"log"
 	"net/url"
 	"os"
 	"sort"
@@ -21,9 +22,9 @@ var DefaultAdPatterns = []string{
 	"2mdn", "imasdk", "googleadapis", "adservice", "ads.youtube", "ad.youtube",
 }
 
-// DefaultVideoURLs are YouTube URLs to visit for ad discovery (trending + popular videos with lots of ads).
+// DefaultVideoURLs are YouTube URLs to visit for ad discovery (popular videos with lots of ads).
+// Note: feed/trending is excluded—it often hangs in headless mode due to infinite loading.
 var DefaultVideoURLs = []string{
-	"https://www.youtube.com/feed/trending",
 	"https://www.youtube.com/watch?v=9bZkp7q19f0",  // Gangnam Style
 	"https://www.youtube.com/watch?v=kJQP7kiw5Fk",  // Despacito
 	"https://www.youtube.com/watch?v=RgKAFK5djSk",  // See You Again
@@ -93,9 +94,10 @@ func (c *Client) Run(ctx context.Context) ([]string, error) {
 		opts = append(opts, chromedp.ExecPath(path))
 	}
 
-	allocCtx, allocCancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	allocCtx, allocCancel := chromedp.NewExecAllocator(ctx, opts...)
 	defer allocCancel()
 
+	log.Println("Launching Chrome...")
 	chromeCtx, chromeCancel := chromedp.NewContext(allocCtx,
 		chromedp.WithErrorf(func(string, ...interface{}) {}), // Suppress CDP unmarshal errors
 	)
@@ -116,6 +118,7 @@ func (c *Client) Run(ctx context.Context) ([]string, error) {
 	})
 
 	// Initial load
+	log.Println("Loading youtube.com...")
 	if err := chromedp.Run(chromeCtx,
 		network.Enable(),
 		chromedp.Navigate("https://www.youtube.com"),
@@ -123,17 +126,25 @@ func (c *Client) Run(ctx context.Context) ([]string, error) {
 	); err != nil {
 		return nil, err
 	}
+	log.Println("YouTube loaded. Visiting videos...")
 
 	// Visit each video and capture traffic
+	n := len(c.config.VideoURLs)
 	for i, videoURL := range c.config.VideoURLs {
+		label := shortVideoLabel(videoURL)
+		log.Printf("[%d/%d] Visiting %s...", i+1, n, label)
 		if err := chromedp.Run(chromeCtx,
 			chromedp.Navigate(videoURL),
 			chromedp.Sleep(5*time.Second), // Let page and ads load
 			chromedp.Sleep(c.config.DurationPerVideo),
 		); err != nil {
-			return nil, err
+			log.Printf("[%d/%d] Warning: %s failed (%v), continuing...", i+1, n, label, err)
+			continue
 		}
-		_ = i // avoid unused if we add logging
+		c.mu.Lock()
+		count := len(c.domains)
+		c.mu.Unlock()
+		log.Printf("[%d/%d] Done with %s (%d domains so far)", i+1, n, label, count)
 	}
 
 	var result []string
@@ -143,8 +154,23 @@ func (c *Client) Run(ctx context.Context) ([]string, error) {
 	}
 	c.mu.Unlock()
 
+	log.Printf("Finished. Discovered %d new ad-related domains.", len(result))
 	sort.Strings(result)
 	return result, nil
+}
+
+func shortVideoLabel(u string) string {
+	parsed, err := url.Parse(u)
+	if err != nil {
+		return u
+	}
+	if strings.Contains(parsed.Path, "/feed/trending") {
+		return "feed/trending"
+	}
+	if q := parsed.Query().Get("v"); q != "" {
+		return "v=" + q
+	}
+	return parsed.Path
 }
 
 func extractHost(rawURL string) string {

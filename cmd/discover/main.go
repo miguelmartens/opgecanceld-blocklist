@@ -61,9 +61,10 @@ func main() {
 		ChromePath:       *chromePath,
 	}, existing)
 
-	totalSec := len(videoURLs) * (int(*duration/time.Second) + 5)
+	totalSec := 5 + len(videoURLs)*(int(*duration/time.Second)+5) // initial load + per-video
+	totalMin := totalSec / 60
 	log.Println("Starting browser and capturing network traffic...")
-	log.Printf("Will visit %d videos, %v per video (~%d s total).\n", len(videoURLs), *duration, totalSec)
+	log.Printf("Will visit %d videos, %v per video (~%dm %ds total).\n", len(videoURLs), *duration, totalMin, totalSec%60)
 
 	newDomains, err := client.Run(context.Background())
 	if err != nil {
