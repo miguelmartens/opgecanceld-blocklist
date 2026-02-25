@@ -9249,3 +9249,7 @@ r9.sn-vgqsenes.googlevideo.com
 r9.sn-vgqsenez.googlevideo.com
 rr1---sn-htgx20capjpq-jb3k.googlevideo.com
 rr8---sn-htgx20capjpq-jb3l.googlevideo.com
+
+# --- Discovered domains ---
+rr1---sn-32o-bg9e.googlevideo.com
+rr5---sn-32o-bg9e.googlevideo.com

@@ -22,7 +22,7 @@ Inspired by the show [AllStarsZonen](https://www.avrotros.nl/programmas/allstars
 Add the list URL to your blocklist sources:
 
 ```
-https://raw.githubusercontent.com/<your-username>/opgecanceld-blocklist/main/opgecanceld-blocklist.txt
+https://raw.githubusercontent.com/miguelmartens/opgecanceld-blocklist/main/opgecanceld-blocklist.txt
 ```
 
 ### Hosts file
@@ -37,13 +37,13 @@ Append the domains to your hosts file with `0.0.0.0` (or `127.0.0.1`):
 **Domain list** (for Pi-hole-style DNS blocking):
 
 ```
-https://raw.githubusercontent.com/<your-username>/opgecanceld-blocklist/main/opgecanceld-blocklist.txt
+https://raw.githubusercontent.com/miguelmartens/opgecanceld-blocklist/main/opgecanceld-blocklist.txt
 ```
 
 **AdGuard / uBlock filter list** (for browser extensions):
 
 ```
-https://raw.githubusercontent.com/<your-username>/opgecanceld-blocklist/main/opgecanceld-filters.txt
+https://raw.githubusercontent.com/miguelmartens/opgecanceld-blocklist/main/opgecanceld-filters.txt
 ```
 
 Add the appropriate URL as a custom filter subscription in your ad-blocker.
@@ -132,7 +132,13 @@ This project uses [Renovate](https://docs.renovatebot.com/) for automated depend
 - Automatic PRs for Go modules and GitHub Actions
 - Scheduled weekly updates (Mondays before 6am UTC)
 
-**Setup:** Install the [Renovate GitHub App](https://github.com/apps/renovate) on the repository. Merge the onboarding PR Renovate creates.
+**Setup:**
+
+1. Install the [Renovate GitHub App](https://github.com/apps/renovate) on the repository
+2. Merge the onboarding PR Renovate creates
+3. Check the Dependency Dashboard issue for available updates
+
+See [docs/RENOVATE_SETUP.md](docs/RENOVATE_SETUP.md) for detailed configuration.
 
 ## License
 
