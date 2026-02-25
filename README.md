@@ -143,6 +143,10 @@ This project uses [Renovate](https://docs.renovatebot.com/) for automated depend
 
 See [docs/RENOVATE_SETUP.md](docs/RENOVATE_SETUP.md) for detailed configuration.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, development commands, and how to open a pull request.
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.

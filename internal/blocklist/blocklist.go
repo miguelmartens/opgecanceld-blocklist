@@ -4,6 +4,7 @@ package blocklist
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strings"
@@ -37,16 +38,41 @@ func LoadDomainSet(path string) (map[string]bool, error) {
 	return existing, nil
 }
 
+const discoveredHeader = "# --- Discovered domains ---"
+
 // AppendDomains appends domains to a blocklist file with a section header.
+// Only adds the header if the file does not already end with the discovered section.
 func AppendDomains(path string, domains []string) error {
+	needHeader := true
+	if info, err := os.Stat(path); err == nil && info.Size() > 0 {
+		f, err := os.Open(path)
+		if err == nil {
+			tailSize := int64(4096)
+			if info.Size() < tailSize {
+				tailSize = info.Size()
+			}
+			f.Seek(-tailSize, io.SeekEnd)
+			tail := make([]byte, tailSize)
+			n, _ := f.Read(tail)
+			f.Close()
+			needHeader = !strings.Contains(string(tail[:n]), discoveredHeader)
+		}
+	}
+
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {
 		return fmt.Errorf("open blocklist: %w", err)
 	}
 	defer f.Close()
 
-	if _, err := f.WriteString("\n# --- Discovered domains ---\n"); err != nil {
-		return fmt.Errorf("write header: %w", err)
+	if needHeader {
+		if _, err := f.WriteString("\n" + discoveredHeader + "\n"); err != nil {
+			return fmt.Errorf("write header: %w", err)
+		}
+	} else {
+		if _, err := f.WriteString("\n"); err != nil {
+			return fmt.Errorf("write newline: %w", err)
+		}
 	}
 	for _, d := range domains {
 		if _, err := fmt.Fprintln(f, d); err != nil {

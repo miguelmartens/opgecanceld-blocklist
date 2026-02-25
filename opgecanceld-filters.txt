@@ -13,6 +13,7 @@
 ||ad.doubleclick.net^
 ||ad.mo.doubleclick.net^
 ||ad.youtube.com^
+||ade.googlesyndication.com^
 ||ads.doubleclick.net^
 ||ads.youtube.com^
 ||adservice.google.com^
@@ -9216,6 +9217,10 @@
 ||rr1---sn-32o-bg9e.googlevideo.com^
 ||rr1---sn-htgx20capjpq-jb3k.googlevideo.com^
 ||rr1---sn-q4fzen7s.googlevideo.com^
+||rr2---sn-32o-bg9e.googlevideo.com^
+||rr2---sn-q4fzenee.googlevideo.com^
+||rr3---sn-32o-bg9e.googlevideo.com^
+||rr4---sn-32o-bg9e.googlevideo.com^
 ||rr5---sn-32o-bg9e.googlevideo.com^
 ||rr8---sn-htgx20capjpq-jb3l.googlevideo.com^
 ||rtd.tubemogul.com^
