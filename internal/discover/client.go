@@ -4,6 +4,7 @@ package discover
 import (
 	"context"
 	"net/url"
+	"os"
 	"sort"
 	"strings"
 	"sync"
@@ -25,6 +26,7 @@ type Config struct {
 	Duration   time.Duration
 	Blocklist  string
 	AdPatterns []string
+	ChromePath string // Path to Chrome/Chromium binary (e.g. for CI). Empty = auto-detect.
 }
 
 // Client captures network traffic from YouTube and extracts ad-related domains.
@@ -46,6 +48,7 @@ func NewClient(cfg Config, existing map[string]bool) *Client {
 			Duration:   cfg.Duration,
 			Blocklist:  cfg.Blocklist,
 			AdPatterns: patterns,
+			ChromePath: cfg.ChromePath,
 		},
 		existing: existing,
 		domains:  make(map[string]struct{}),
@@ -61,6 +64,11 @@ func (c *Client) Run(ctx context.Context) ([]string, error) {
 		chromedp.Flag("no-sandbox", true),
 		chromedp.Flag("disable-dev-shm-usage", true),
 	)
+	if path := c.config.ChromePath; path != "" {
+		opts = append(opts, chromedp.ExecPath(path))
+	} else if path := os.Getenv("CHROME_PATH"); path != "" {
+		opts = append(opts, chromedp.ExecPath(path))
+	}
 
 	allocCtx, allocCancel := chromedp.NewExecAllocator(context.Background(), opts...)
 	defer allocCancel()

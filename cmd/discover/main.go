@@ -27,6 +27,7 @@ func main() {
 	output := flag.String("output", "", "Output file for new domains (default: stdout)")
 	doAppend := flag.Bool("append", false, "Append new domains to blocklist")
 	buildFilters := flag.Bool("build-filters", false, "Generate AdGuard/uBlock filter list from blocklist (no discovery)")
+	chromePath := flag.String("chrome", "", "Path to Chrome/Chromium binary (default: auto-detect, or CHROME_PATH env)")
 	flag.Parse()
 
 	if *buildFilters {
@@ -40,8 +41,9 @@ func main() {
 	}
 
 	client := discover.NewClient(discover.Config{
-		Duration:  *duration,
-		Blocklist: defaultBlocklistPath,
+		Duration:   *duration,
+		Blocklist:  defaultBlocklistPath,
+		ChromePath: *chromePath,
 	}, existing)
 
 	log.Println("Starting browser and capturing network traffic...")

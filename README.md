@@ -109,6 +109,22 @@ go run ./cmd/discover/
 - **Markdown/YAML/JSON:** `make format-check` (CI check) or `make format` / `make prettier` to fix. Prettier is pinned to 3.3.2.
 - **YAML:** `make lint-yaml` (yamllint)
 
+## Automated Discovery
+
+A [scheduled workflow](.github/workflows/discover-scheduled.yml) runs weekly (Mondays at 6am UTC) to discover new YouTube ad domains and open a pull request with any updates:
+
+1. Runs the discover tool with a 30-second capture
+2. Appends new domains to the blocklist and regenerates filters
+3. Creates a PR with the changes (or updates an existing PR)
+4. Auto-approves and enables auto-merge so the PR merges without manual intervention
+
+Trigger manually via **Actions → Discover ad domains → Run workflow**.
+
+**Required repo settings** for auto-merge to work:
+
+- **Settings → General → Pull Requests:** Enable "Allow auto-merge"
+- **Settings → Branches:** Add a branch protection rule for `main` with at least one requirement (e.g. "Require status checks to pass")
+
 ## Automated Dependency Management
 
 This project uses [Renovate](https://docs.renovatebot.com/) for automated dependency updates:
