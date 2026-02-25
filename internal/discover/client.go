@@ -25,14 +25,14 @@ var DefaultAdPatterns = []string{
 // DefaultVideoURLs are YouTube URLs to visit for ad discovery (popular videos with lots of ads).
 // Note: feed/trending is excluded—it often hangs in headless mode due to infinite loading.
 var DefaultVideoURLs = []string{
-	"https://www.youtube.com/watch?v=9bZkp7q19f0",  // Gangnam Style
-	"https://www.youtube.com/watch?v=kJQP7kiw5Fk",  // Despacito
-	"https://www.youtube.com/watch?v=RgKAFK5djSk",  // See You Again
-	"https://www.youtube.com/watch?v=OPf0YbXqDm0",  // Uptown Funk
-	"https://www.youtube.com/watch?v=09R8_2nJtjg",  // Sugar
-	"https://www.youtube.com/watch?v=JGwWNGJdvx8",  // Shape of You
-	"https://www.youtube.com/watch?v=kxopViU98Xo",  // Baby Shark
-	"https://www.youtube.com/watch?v=dQw4w9WgXcQ",  // Never Gonna Give You Up
+	"https://www.youtube.com/watch?v=9bZkp7q19f0", // Gangnam Style
+	"https://www.youtube.com/watch?v=kJQP7kiw5Fk", // Despacito
+	"https://www.youtube.com/watch?v=RgKAFK5djSk", // See You Again
+	"https://www.youtube.com/watch?v=OPf0YbXqDm0", // Uptown Funk
+	"https://www.youtube.com/watch?v=09R8_2nJtjg", // Sugar
+	"https://www.youtube.com/watch?v=JGwWNGJdvx8", // Shape of You
+	"https://www.youtube.com/watch?v=kxopViU98Xo", // Baby Shark
+	"https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Never Gonna Give You Up
 }
 
 // Config holds configuration for the discovery client.

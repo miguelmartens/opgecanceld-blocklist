@@ -136,4 +136,3 @@ func GenerateFilters(blocklistPath, outputPath string) (int, error) {
 	}
 	return len(sorted), nil
 }
-

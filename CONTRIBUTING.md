@@ -56,18 +56,18 @@ Thank you for your interest in contributing. This document explains how to get s
 
 ## Development commands
 
-| Command           | Description                                              |
-| ----------------- | -------------------------------------------------------- |
-| `make build`      | Build binary to `bin/discover`                            |
-| `make build-filters` | Generate AdGuard/uBlock filter list from blocklist    |
-| `make run`        | Build and run (discovers and appends new domains)         |
-| `make dev`        | Clean, then build and run                                 |
-| `make test`       | Run tests                                                 |
-| `make lint`       | Run golangci-lint                                        |
-| `make fmt`        | Format Go code and tidy modules                           |
-| `make format`     | Format Markdown/YAML/JSON with Prettier                    |
-| `make format-check` | Check formatting (CI)                                   |
-| `make lint-yaml`  | Run yamllint on YAML files                                |
+| Command              | Description                                        |
+| -------------------- | -------------------------------------------------- |
+| `make build`         | Build binary to `bin/discover`                     |
+| `make build-filters` | Generate AdGuard/uBlock filter list from blocklist |
+| `make run`           | Build and run (discovers and appends new domains)  |
+| `make dev`           | Clean, then build and run                          |
+| `make test`          | Run tests                                          |
+| `make lint`          | Run golangci-lint                                  |
+| `make fmt`           | Format Go code and tidy modules                    |
+| `make format`        | Format Markdown/YAML/JSON with Prettier            |
+| `make format-check`  | Check formatting (CI)                              |
+| `make lint-yaml`     | Run yamllint on YAML files                         |
 
 ## Pull request process
 
