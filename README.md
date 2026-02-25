@@ -74,6 +74,33 @@ The AdGuard/uBlock filter list is generated from the domain blocklist. After edi
 python3 build-filters.py
 ```
 
+## Discovering new ad domains
+
+The `discover` tool uses a headless browser to capture network traffic from YouTube and extract ad-related domains. It filters requests against known ad patterns (googlevideo, doubleclick, googlesyndication, etc.) and reports domains not yet in the blocklist.
+
+**Requirements:** Chrome or Chromium must be installed (chromedp will find it automatically). Go 1.26+ to build from source.
+
+```bash
+# Build and run (captures for 2 minutes by default)
+make run
+
+# Or with go run
+go run ./cmd/discover/
+
+# Shorter capture for testing (30 seconds)
+./bin/discover -duration 30s
+
+# Save new domains to a file
+./bin/discover -output new-domains.txt
+
+# Append new domains directly to the blocklist
+./bin/discover -append
+```
+
+**Makefile targets:** `make build`, `make run`, `make dev`, `make test`, `make lint`, `make fmt`, `make install`
+
+After adding new domains, run `python3 build-filters.py` to regenerate the filter list.
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
