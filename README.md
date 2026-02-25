@@ -1,2 +1,154 @@
-# opgecanceld-blocklist
-Block YouTube ads at the source. Domain list for Pi-hole/AdGuard DNS + AdGuard/uBlock filter list.
+# Opgecanceld Blocklist
+
+A domain blocklist focused on blocking YouTube advertisements, tracking, and ad-related services. Use this list to reduce or block YouTube ads across your devices and ad-blocking tools.
+
+**Best effort.** This list is maintained as-is and cannot guarantee complete ad blocking; ad networks change frequently. It may also block more than intended (e.g. legitimate content). If you run into issues, please open an [issue](https://github.com/miguelmartens/opgecanceld-blocklist/issues) or [pull request](https://github.com/miguelmartens/opgecanceld-blocklist/pulls).
+
+## Name
+
+**Opgecanceld** is a Dutch neologism derived from _opgedonderd_ (a mild Dutch expletive) and _gecanceld_ (cancelled). A playful nod to cancel culture—here we cancel ads instead. Ads get _opgecanceld_.
+
+Inspired by the show [AllStarsZonen](https://www.avrotros.nl/programmas/allstarszonen) / [Rundfunk](https://www.avrotros.nl/programmas/rundfunk). See [this clip](https://www.youtube.com/shorts/zd6ULJ1jLdo).
+
+## Lists
+
+| Format                  | Link                                                   | Compatible with                                                                                                        |
+| ----------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Domain list             | [opgecanceld-blocklist.txt](opgecanceld-blocklist.txt) | Pi-hole, AdGuard, AdGuard Home, uBlock Origin, AdAway, Blokada, DNS66, pfBlockerNG, Blocky, Technitium DNS, hosts file |
+| AdGuard / uBlock filter | [opgecanceld-filters.txt](opgecanceld-filters.txt)     | AdGuard, uBlock Origin, AdBlock Plus                                                                                   |
+
+## Usage
+
+### Pi-hole / AdGuard Home / DNS-based blockers
+
+Add the list URL to your blocklist sources:
+
+```
+https://raw.githubusercontent.com/miguelmartens/opgecanceld-blocklist/main/opgecanceld-blocklist.txt
+```
+
+### Hosts file
+
+Append the domains to your hosts file with `0.0.0.0` (or `127.0.0.1`):
+
+- **Windows:** `C:\Windows\System32\drivers\etc\hosts`
+- **macOS / Linux:** `/etc/hosts`
+
+### Ad-blocker extensions (uBlock Origin, AdGuard, etc.)
+
+**Domain list** (for Pi-hole-style DNS blocking):
+
+```
+https://raw.githubusercontent.com/miguelmartens/opgecanceld-blocklist/main/opgecanceld-blocklist.txt
+```
+
+**AdGuard / uBlock filter list** (for browser extensions):
+
+```
+https://raw.githubusercontent.com/miguelmartens/opgecanceld-blocklist/main/opgecanceld-filters.txt
+```
+
+Add the appropriate URL as a custom filter subscription in your ad-blocker.
+
+## What this list blocks
+
+- YouTube ad servers and tracking domains
+- Google ad services (DoubleClick, Google Ads)
+- Video ad networks (Innovid, Moat, etc.)
+- Analytics and tracking scripts used for ad delivery
+
+## Compatibility
+
+- **Pi-hole** ✓
+- **AdGuard / AdGuard Home** ✓
+- **uBlock Origin** ✓
+- **AdAway** (Android, rooted) ✓
+- **Blokada** ✓
+- **DNS66** ✓
+- **pfBlockerNG** ✓
+- **Hosts file** ✓
+
+## Building
+
+The AdGuard/uBlock filter list is generated from the domain blocklist. After editing `opgecanceld-blocklist.txt`, regenerate the filters:
+
+```bash
+make build-filters
+# or
+./bin/discover -build-filters
+```
+
+## Discovering new ad domains
+
+The `discover` tool uses a headless browser to capture network traffic from YouTube and extract ad-related domains. It visits multiple videos (trending page + popular videos with lots of ads) and filters requests against known ad patterns (googlevideo, doubleclick, googlesyndication, etc.), reporting domains not yet in the blocklist.
+
+**Requirements:** Chrome or Chromium must be installed (chromedp will find it automatically). Go 1.26+ to build from source.
+
+```bash
+# Build and run (visits 8 popular videos, 1 minute per video by default)
+make run
+
+# Or with go run
+go run ./cmd/discover/
+
+# Shorter capture for testing (30 seconds per video)
+./bin/discover -duration 30s
+
+# Use custom video URLs (comma-separated)
+./bin/discover -videos "https://www.youtube.com/watch?v=VIDEO_ID"
+
+# Save new domains to a file
+./bin/discover -output new-domains.txt
+
+# Append new domains directly to the blocklist (also regenerates filters)
+./bin/discover -append
+```
+
+**Makefile targets:** `make build`, `make build-filters`, `make run`, `make dev`, `make test`, `make lint`, `make fmt`, `make install`, `make format`, `make format-check`, `make lint-yaml`, `make renovate`
+
+`make run` and `make dev` append new domains and regenerate the filter list automatically.
+
+## Development
+
+- **Go:** `make fmt` (format code, tidy modules), `make test`, `make lint` (golangci-lint)
+- **Markdown/YAML/JSON:** `make format-check` (CI check) or `make format` / `make prettier` to fix. Prettier is pinned to 3.3.2.
+- **YAML:** `make lint-yaml` (yamllint)
+
+## Automated Discovery
+
+A [scheduled workflow](.github/workflows/discover-scheduled.yml) runs **daily** at 6am UTC to discover new YouTube ad domains and open a pull request with any updates:
+
+1. Runs the discover tool across 8 popular videos with ads, 1 minute per video
+2. Appends new domains to the blocklist and regenerates filters
+3. Creates a PR with the changes (or updates an existing PR)
+4. Auto-approves and enables auto-merge so the PR merges without manual intervention
+
+Trigger manually via **Actions → Discover ad domains → Run workflow**.
+
+**Required repo settings** for auto-merge to work:
+
+- **Settings → General → Pull Requests:** Enable "Allow auto-merge"
+- **Settings → Branches:** Add a branch protection rule for `main` with at least one requirement (e.g. "Require status checks to pass")
+
+## Automated Dependency Management
+
+This project uses [Renovate](https://docs.renovatebot.com/) for automated dependency updates:
+
+- Automatic PRs for Go modules and GitHub Actions
+- Scheduled weekly updates (Mondays before 6am UTC)
+
+**Setup:**
+
+1. Install the [Renovate GitHub App](https://github.com/apps/renovate) on the repository
+2. Merge the onboarding PR Renovate creates
+3. Check the Dependency Dashboard issue for available updates
+
+See [docs/RENOVATE_SETUP.md](docs/RENOVATE_SETUP.md) for detailed configuration.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, development commands, and how to open a pull request.
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.

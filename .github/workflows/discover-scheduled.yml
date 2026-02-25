@@ -1,0 +1,66 @@
+name: Discover ad domains
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  schedule:
+    # Run daily at 6am UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Set up Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          install-dependencies: true
+
+      - name: Discover and append new ad domains
+        run: |
+          go run ./cmd/discover/ -append -duration 1m -chrome "${{ steps.chrome.outputs.chrome-path }}"
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: discover/update-blocklist
+          commit-message: |
+            chore: add discovered YouTube ad domains
+
+            Automated update from discover workflow.
+          title: 'chore: add discovered YouTube ad domains'
+          body: |
+            This PR adds newly discovered YouTube ad domains from the automated discovery workflow.
+
+            **Changes:**
+            - New domains appended to `opgecanceld-blocklist.txt`
+            - AdGuard/uBlock filter list regenerated
+          labels: dependencies, automated
+          add-paths: |
+            opgecanceld-blocklist.txt
+            opgecanceld-filters.txt
+
+      - name: Auto approve
+        if: steps.cpr.outputs.pull-request-number != ''
+        run: gh pr review --approve "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge
+        if: steps.cpr.outputs.pull-request-number != ''
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash
