@@ -28,9 +28,9 @@ googlevideo.com
 	}
 
 	want := map[string]bool{
-		"example.com":      true,
-		"doubleclick.net":  true,
-		"googlevideo.com":  true,
+		"example.com":     true,
+		"doubleclick.net": true,
+		"googlevideo.com": true,
 	}
 	for d, ok := range want {
 		if !got[d] {
