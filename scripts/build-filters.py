@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """
 Generate AdGuard / uBlock Origin filter list from opgecanceld-blocklist.txt.
-Run: python3 build-filters.py
+Run from project root: python3 scripts/build-filters.py
 """
 
-BLOCKLIST = "opgecanceld-blocklist.txt"
-OUTPUT = "opgecanceld-filters.txt"
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+
+BLOCKLIST = os.path.join(ROOT_DIR, "opgecanceld-blocklist.txt")
+OUTPUT = os.path.join(ROOT_DIR, "opgecanceld-filters.txt")
 
 HEADER = """! --------------------------------------------
 ! Opgecanceld - AdGuard / uBlock Origin filter list

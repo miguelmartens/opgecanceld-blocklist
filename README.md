@@ -4,16 +4,16 @@ A domain blocklist focused on blocking YouTube advertisements, tracking, and ad-
 
 ## Name
 
-**Opgecanceld** is a Dutch neologism derived from *opgedonderd* (a mild Dutch expletive) and *gecanceld* (cancelled). A playful nod to cancel culture—here we cancel ads instead. Ads get *opgecanceld*.
+**Opgecanceld** is a Dutch neologism derived from _opgedonderd_ (a mild Dutch expletive) and _gecanceld_ (cancelled). A playful nod to cancel culture—here we cancel ads instead. Ads get _opgecanceld_.
 
 Inspired by the show [AllStarsZonen](https://www.avrotros.nl/programmas/allstarszonen) / [Rundfunk](https://www.avrotros.nl/programmas/rundfunk). See [this clip](https://www.youtube.com/shorts/zd6ULJ1jLdo).
 
 ## Lists
 
-| Format | Link | Compatible with |
-|--------|------|-----------------|
-| Domain list | [opgecanceld-blocklist.txt](opgecanceld-blocklist.txt) | Pi-hole, AdGuard, AdGuard Home, uBlock Origin, AdAway, Blokada, DNS66, pfBlockerNG, Blocky, Technitium DNS, hosts file |
-| AdGuard / uBlock filter | [opgecanceld-filters.txt](opgecanceld-filters.txt) | AdGuard, uBlock Origin, AdBlock Plus |
+| Format                  | Link                                                   | Compatible with                                                                                                        |
+| ----------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Domain list             | [opgecanceld-blocklist.txt](opgecanceld-blocklist.txt) | Pi-hole, AdGuard, AdGuard Home, uBlock Origin, AdAway, Blokada, DNS66, pfBlockerNG, Blocky, Technitium DNS, hosts file |
+| AdGuard / uBlock filter | [opgecanceld-filters.txt](opgecanceld-filters.txt)     | AdGuard, uBlock Origin, AdBlock Plus                                                                                   |
 
 ## Usage
 
@@ -71,7 +71,9 @@ Add the appropriate URL as a custom filter subscription in your ad-blocker.
 The AdGuard/uBlock filter list is generated from the domain blocklist. After editing `opgecanceld-blocklist.txt`, regenerate the filters:
 
 ```bash
-python3 build-filters.py
+make build-filters
+# or
+python3 scripts/build-filters.py
 ```
 
 ## Discovering new ad domains
@@ -97,9 +99,24 @@ go run ./cmd/discover/
 ./bin/discover -append
 ```
 
-**Makefile targets:** `make build`, `make run`, `make dev`, `make test`, `make lint`, `make fmt`, `make install`
+**Makefile targets:** `make build`, `make build-filters`, `make run`, `make dev`, `make test`, `make lint`, `make fmt`, `make install`, `make format`, `make format-check`, `make lint-yaml`, `make renovate`
 
-After adding new domains, run `python3 build-filters.py` to regenerate the filter list.
+After adding new domains, run `make build-filters` to regenerate the filter list.
+
+## Development
+
+- **Go:** `make fmt` (format code, tidy modules), `make test`, `make lint` (golangci-lint)
+- **Markdown/YAML/JSON:** `make format-check` (CI check) or `make format` / `make prettier` to fix. Prettier is pinned to 3.3.2.
+- **YAML:** `make lint-yaml` (yamllint)
+
+## Automated Dependency Management
+
+This project uses [Renovate](https://docs.renovatebot.com/) for automated dependency updates:
+
+- Automatic PRs for Go modules and GitHub Actions
+- Scheduled weekly updates (Mondays before 6am UTC)
+
+**Setup:** Install the [Renovate GitHub App](https://github.com/apps/renovate) on the repository. Merge the onboarding PR Renovate creates.
 
 ## License
 

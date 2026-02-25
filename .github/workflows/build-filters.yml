@@ -7,7 +7,7 @@ on:
   push:
     paths:
       - opgecanceld-blocklist.txt
-      - build-filters.py
+      - scripts/build-filters.py
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Generate AdGuard filter list
-        run: python3 build-filters.py
+        run: python3 scripts/build-filters.py
 
       - name: Commit and push if changed
         run: |
