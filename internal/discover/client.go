@@ -87,6 +87,9 @@ func (c *Client) Run(ctx context.Context) ([]string, error) {
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-sandbox", true),
 		chromedp.Flag("disable-dev-shm-usage", true),
+		chromedp.Flag("disable-setuid-sandbox", true),
+		chromedp.Flag("disable-breakpad", true),
+		chromedp.Flag("disable-crashpad", true),
 	)
 	if path := c.config.ChromePath; path != "" {
 		opts = append(opts, chromedp.ExecPath(path))
