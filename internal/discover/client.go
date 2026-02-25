@@ -21,12 +21,26 @@ var DefaultAdPatterns = []string{
 	"2mdn", "imasdk", "googleadapis", "adservice", "ads.youtube", "ad.youtube",
 }
 
+// DefaultVideoURLs are YouTube URLs to visit for ad discovery (trending + popular videos with lots of ads).
+var DefaultVideoURLs = []string{
+	"https://www.youtube.com/feed/trending",
+	"https://www.youtube.com/watch?v=9bZkp7q19f0",  // Gangnam Style
+	"https://www.youtube.com/watch?v=kJQP7kiw5Fk",  // Despacito
+	"https://www.youtube.com/watch?v=RgKAFK5djSk",  // See You Again
+	"https://www.youtube.com/watch?v=OPf0YbXqDm0",  // Uptown Funk
+	"https://www.youtube.com/watch?v=09R8_2nJtjg",  // Sugar
+	"https://www.youtube.com/watch?v=JGwWNGJdvx8",  // Shape of You
+	"https://www.youtube.com/watch?v=kxopViU98Xo",  // Baby Shark
+	"https://www.youtube.com/watch?v=dQw4w9WgXcQ",  // Never Gonna Give You Up
+}
+
 // Config holds configuration for the discovery client.
 type Config struct {
-	Duration   time.Duration
-	Blocklist  string
-	AdPatterns []string
-	ChromePath string // Path to Chrome/Chromium binary (e.g. for CI). Empty = auto-detect.
+	DurationPerVideo time.Duration // How long to capture traffic per video. 0 = 1 minute.
+	VideoURLs        []string      // YouTube URLs to visit (trending, popular videos). Empty = use DefaultVideoURLs.
+	Blocklist        string
+	AdPatterns       []string
+	ChromePath       string // Path to Chrome/Chromium binary (e.g. for CI). Empty = auto-detect.
 }
 
 // Client captures network traffic from YouTube and extracts ad-related domains.
@@ -43,20 +57,29 @@ func NewClient(cfg Config, existing map[string]bool) *Client {
 	if len(patterns) == 0 {
 		patterns = DefaultAdPatterns
 	}
+	urls := cfg.VideoURLs
+	if len(urls) == 0 {
+		urls = DefaultVideoURLs
+	}
+	dur := cfg.DurationPerVideo
+	if dur == 0 {
+		dur = time.Minute
+	}
 	return &Client{
 		config: Config{
-			Duration:   cfg.Duration,
-			Blocklist:  cfg.Blocklist,
-			AdPatterns: patterns,
-			ChromePath: cfg.ChromePath,
+			DurationPerVideo: dur,
+			VideoURLs:        urls,
+			Blocklist:        cfg.Blocklist,
+			AdPatterns:       patterns,
+			ChromePath:       cfg.ChromePath,
 		},
 		existing: existing,
 		domains:  make(map[string]struct{}),
 	}
 }
 
-// Run navigates to YouTube, captures network traffic for the configured duration,
-// and returns newly discovered ad-related domains not in the existing set.
+// Run navigates to YouTube, visits each configured video URL, captures network traffic
+// for the configured duration per video, and returns newly discovered ad-related domains.
 func (c *Client) Run(ctx context.Context) ([]string, error) {
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("headless", true),
@@ -92,18 +115,25 @@ func (c *Client) Run(ctx context.Context) ([]string, error) {
 		}
 	})
 
-	tasks := chromedp.Tasks{
+	// Initial load
+	if err := chromedp.Run(chromeCtx,
 		network.Enable(),
 		chromedp.Navigate("https://www.youtube.com"),
-		chromedp.Sleep(5 * time.Second),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			return chromedp.Navigate("https://www.youtube.com/watch?v=dQw4w9WgXcQ").Do(ctx)
-		}),
-		chromedp.Sleep(c.config.Duration),
+		chromedp.Sleep(5*time.Second),
+	); err != nil {
+		return nil, err
 	}
 
-	if err := chromedp.Run(chromeCtx, tasks); err != nil {
-		return nil, err
+	// Visit each video and capture traffic
+	for i, videoURL := range c.config.VideoURLs {
+		if err := chromedp.Run(chromeCtx,
+			chromedp.Navigate(videoURL),
+			chromedp.Sleep(5*time.Second), // Let page and ads load
+			chromedp.Sleep(c.config.DurationPerVideo),
+		); err != nil {
+			return nil, err
+		}
+		_ = i // avoid unused if we add logging
 	}
 
 	var result []string

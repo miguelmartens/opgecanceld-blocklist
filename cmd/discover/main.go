@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/miguelmartens/opgecanceld-blocklist/internal/blocklist"
@@ -23,7 +24,8 @@ const (
 )
 
 func main() {
-	duration := flag.Duration("duration", 2*time.Minute, "How long to capture traffic")
+	duration := flag.Duration("duration", 1*time.Minute, "How long to capture traffic per video")
+	videos := flag.String("videos", "", "Comma-separated YouTube URLs (default: trending + popular videos)")
 	output := flag.String("output", "", "Output file for new domains (default: stdout)")
 	doAppend := flag.Bool("append", false, "Append new domains to blocklist")
 	buildFilters := flag.Bool("build-filters", false, "Generate AdGuard/uBlock filter list from blocklist (no discovery)")
@@ -40,14 +42,28 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var videoURLs []string
+	if *videos != "" {
+		for _, u := range strings.Split(*videos, ",") {
+			if u = strings.TrimSpace(u); u != "" {
+				videoURLs = append(videoURLs, u)
+			}
+		}
+	}
+	if len(videoURLs) == 0 {
+		videoURLs = discover.DefaultVideoURLs
+	}
+
 	client := discover.NewClient(discover.Config{
-		Duration:   *duration,
-		Blocklist:  defaultBlocklistPath,
-		ChromePath: *chromePath,
+		DurationPerVideo: *duration,
+		VideoURLs:        videoURLs,
+		Blocklist:        defaultBlocklistPath,
+		ChromePath:       *chromePath,
 	}, existing)
 
+	totalSec := len(videoURLs) * (int(*duration/time.Second) + 5)
 	log.Println("Starting browser and capturing network traffic...")
-	log.Printf("Will capture for %v. Browse YouTube or wait for ads to load.\n", *duration)
+	log.Printf("Will visit %d videos, %v per video (~%d s total).\n", len(videoURLs), *duration, totalSec)
 
 	newDomains, err := client.Run(context.Background())
 	if err != nil {

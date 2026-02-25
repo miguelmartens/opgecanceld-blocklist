@@ -78,19 +78,22 @@ make build-filters
 
 ## Discovering new ad domains
 
-The `discover` tool uses a headless browser to capture network traffic from YouTube and extract ad-related domains. It filters requests against known ad patterns (googlevideo, doubleclick, googlesyndication, etc.) and reports domains not yet in the blocklist.
+The `discover` tool uses a headless browser to capture network traffic from YouTube and extract ad-related domains. It visits multiple videos (trending page + popular videos with lots of ads) and filters requests against known ad patterns (googlevideo, doubleclick, googlesyndication, etc.), reporting domains not yet in the blocklist.
 
 **Requirements:** Chrome or Chromium must be installed (chromedp will find it automatically). Go 1.26+ to build from source.
 
 ```bash
-# Build and run (captures for 2 minutes by default)
+# Build and run (visits 9 videos: trending + popular, 1 minute per video by default)
 make run
 
 # Or with go run
 go run ./cmd/discover/
 
-# Shorter capture for testing (30 seconds)
+# Shorter capture for testing (30 seconds per video)
 ./bin/discover -duration 30s
+
+# Use custom video URLs (comma-separated)
+./bin/discover -videos "https://www.youtube.com/watch?v=VIDEO_ID"
 
 # Save new domains to a file
 ./bin/discover -output new-domains.txt
@@ -111,9 +114,9 @@ go run ./cmd/discover/
 
 ## Automated Discovery
 
-A [scheduled workflow](.github/workflows/discover-scheduled.yml) runs weekly (Mondays at 6am UTC) to discover new YouTube ad domains and open a pull request with any updates:
+A [scheduled workflow](.github/workflows/discover-scheduled.yml) runs **daily** at 6am UTC to discover new YouTube ad domains and open a pull request with any updates:
 
-1. Runs the discover tool with a 30-second capture
+1. Runs the discover tool across 9 videos (trending + popular videos with ads), 1 minute per video
 2. Appends new domains to the blocklist and regenerates filters
 3. Creates a PR with the changes (or updates an existing PR)
 4. Auto-approves and enables auto-merge so the PR merges without manual intervention

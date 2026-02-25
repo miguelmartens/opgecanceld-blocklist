@@ -6,8 +6,8 @@ permissions:
 
 on:
   schedule:
-    # Run weekly on Monday at 6am UTC (aligns with Renovate)
-    - cron: '0 6 * * 1'
+    # Run daily at 6am UTC
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
 
       - name: Discover and append new ad domains
         run: |
-          go run ./cmd/discover/ -append -duration 30s -chrome "${{ steps.chrome.outputs.chrome-path }}"
+          go run ./cmd/discover/ -append -duration 1m -chrome "${{ steps.chrome.outputs.chrome-path }}"
 
       - name: Create Pull Request
         id: cpr
