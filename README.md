@@ -2,6 +2,8 @@
 
 A domain blocklist focused on blocking YouTube advertisements, tracking, and ad-related services. Use this list to reduce or block YouTube ads across your devices and ad-blocking tools.
 
+**Best effort.** This list is maintained as-is and cannot guarantee complete ad blocking; ad networks change frequently. It may also block more than intended (e.g. legitimate content). If you run into issues, please open an [issue](https://github.com/miguelmartens/opgecanceld-blocklist/issues) or [pull request](https://github.com/miguelmartens/opgecanceld-blocklist/pulls).
+
 ## Name
 
 **Opgecanceld** is a Dutch neologism derived from _opgedonderd_ (a mild Dutch expletive) and _gecanceld_ (cancelled). A playful nod to cancel culture—here we cancel ads instead. Ads get _opgecanceld_.
