@@ -37,11 +37,11 @@ build:
 	@mkdir -p $(BIN_DIR)
 	BINARY=$(OUT) MAIN=$(MAIN) $(SCRIPTS)/build.sh
 
-build-filters:
-	python3 $(SCRIPTS)/build-filters.py
+build-filters: build
+	$(OUT) -build-filters
 
 run: build
-	$(OUT)
+	$(OUT) -append
 
 dev: clean run
 

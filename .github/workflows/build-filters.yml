@@ -7,7 +7,8 @@ on:
   push:
     paths:
       - opgecanceld-blocklist.txt
-      - scripts/build-filters.py
+      - cmd/discover/main.go
+      - internal/blocklist/
   workflow_dispatch:
 
 jobs:
@@ -16,8 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
       - name: Generate AdGuard filter list
-        run: python3 scripts/build-filters.py
+        run: go run ./cmd/discover/ -build-filters
 
       - name: Commit and push if changed
         run: |

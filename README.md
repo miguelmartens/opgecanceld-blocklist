@@ -73,7 +73,7 @@ The AdGuard/uBlock filter list is generated from the domain blocklist. After edi
 ```bash
 make build-filters
 # or
-python3 scripts/build-filters.py
+./bin/discover -build-filters
 ```
 
 ## Discovering new ad domains
@@ -95,13 +95,13 @@ go run ./cmd/discover/
 # Save new domains to a file
 ./bin/discover -output new-domains.txt
 
-# Append new domains directly to the blocklist
+# Append new domains directly to the blocklist (also regenerates filters)
 ./bin/discover -append
 ```
 
 **Makefile targets:** `make build`, `make build-filters`, `make run`, `make dev`, `make test`, `make lint`, `make fmt`, `make install`, `make format`, `make format-check`, `make lint-yaml`, `make renovate`
 
-After adding new domains, run `make build-filters` to regenerate the filter list.
+`make run` and `make dev` append new domains and regenerate the filter list automatically.
 
 ## Development
 

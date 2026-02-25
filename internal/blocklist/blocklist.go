@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -70,3 +71,43 @@ func WriteDomains(path string, domains []string) error {
 	}
 	return nil
 }
+
+// AdGuardFilterHeader is the header for the generated AdGuard/uBlock filter list.
+const AdGuardFilterHeader = `! --------------------------------------------
+! Opgecanceld - AdGuard / uBlock Origin filter list
+! --------------------------------------------
+! Title: Opgecanceld
+! Description: Blocks YouTube ads, tracking, and ad-related services.
+! Homepage: https://github.com/your-username/opgecanceld-blocklist
+! License: MIT
+! Expires: 4 days
+!
+`
+
+// GenerateFilters reads the blocklist and writes the AdGuard/uBlock filter list.
+func GenerateFilters(blocklistPath, outputPath string) (int, error) {
+	domains, err := LoadDomainSet(blocklistPath)
+	if err != nil {
+		return 0, fmt.Errorf("load blocklist: %w", err)
+	}
+
+	var sorted []string
+	for d := range domains {
+		sorted = append(sorted, d)
+	}
+	sort.Strings(sorted)
+
+	var b strings.Builder
+	b.WriteString(AdGuardFilterHeader)
+	for _, d := range sorted {
+		b.WriteString("||")
+		b.WriteString(d)
+		b.WriteString("^\n")
+	}
+
+	if err := os.WriteFile(outputPath, []byte(b.String()), 0o644); err != nil {
+		return 0, fmt.Errorf("write filters: %w", err)
+	}
+	return len(sorted), nil
+}
+
